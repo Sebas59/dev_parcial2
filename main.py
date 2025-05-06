@@ -27,3 +27,7 @@ async def crear_usuario(usuario: UsuarioCreate, session: AsyncSession = Depends(
 async def obtener_usuarios(session: AsyncSession = Depends(get_session)):
     return await obtener_usuarios(session)
 
+@app.get("/usuarios/{usuario_email}", response_model=Usuario)
+async def obtener_usuario_por_email(usuario_email=str, session:AsyncSession=Depends(get_session)):
+    return await obtener_usuario_por_email(usuario_email, session)
+
