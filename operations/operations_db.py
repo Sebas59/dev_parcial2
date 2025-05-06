@@ -75,3 +75,12 @@ async def obtener_usuarios_inactivos_db(session:AsyncSession):
         )
     )
     return result.scalars().all()
+
+async def obtener_usuarios_inactivos_premuim_db(session:AsyncSession):
+    result = await session.execute(
+        select(Usuario).where(
+             Usuario.estado == EstadoUsuario.inactivo,
+                Usuario.premium == True
+        )
+    )
+    return result.scalars().all()
