@@ -34,3 +34,7 @@ async def obtener_usuario_por_email(usuario_email=str, session:AsyncSession=Depe
 @app.put("/usuarios/{usuario_email}", response_model=Usuario)
 async def actualizar_usuario_db(usuario_email:str, usuario:UsuarioCreate, session:AsyncSession=Depends(get_session)):
     return await actualizar_usuario(usuario_email, usuario, session)
+
+@app.patch("/usuarios/{usuario_email}/premium", response_model=Usuario)
+async def actualizar_usuario_premium(usuario_email:str, usuario_premium:bool, session:AsyncSession=Depends(get_session)):
+    return await actualizar_usuario_premium(usuario_email, usuario_premium, session)
