@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from data.models import Usuario  
 
 
-CLEVER_DB = "postgresql+asyncpg://ul4hccuettzgoiqd9yta:kfm64ncmCVTEVLGC2GoomVtMiQfPug@bqopazig060sqbtmncaq-postgresql.services.clever-cloud.com:50013/bqopazig060sqbtmncaq"
+CLEVER_DB = "postgresql+asyncpg://uqjiuomadomuiec8l9rh:RUfcq5iik9InhkMqHmgHome6Dx1u5P@btxeqemnguinig2jil2m-postgresql.services.clever-cloud.com:50013/btxeqemnguinig2jil2m"
 
 engine: AsyncEngine = create_async_engine(CLEVER_DB, echo=True)
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
