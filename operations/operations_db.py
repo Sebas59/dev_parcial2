@@ -68,10 +68,10 @@ async def actualizar_usuario_premium(usuario_email:str, usuario_premium:bool, se
         await session.rollback()
         raise HTTPException(status_code=400, detail="Error al actualizar el estado del usuario a premium.")
     
-async def obtener_usuarios_inactivos_db(session:AsyncSession) -> List[Usuario]:
+async def obtener_usuarios_inactivos_db(session:AsyncSession):
     result = await session.execute(
         select(Usuario).where(
-             Usuario.estado == EstadoUsuario.inactivo, 
+             Usuario.estado == EstadoUsuario.inactivo
         )
     )
     return result.scalars().all()
