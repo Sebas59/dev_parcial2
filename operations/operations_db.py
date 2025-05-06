@@ -51,3 +51,20 @@ async def actualizar_usuario(usuario_email: str, usuario: UsuarioCreate, session
     await session.refresh(usuario_db)
     return usuario_db
 
+async def actualizar_usuario_premium(usuario_email:str, usuario_premium:bool, session:AsyncSession):
+    usuario= await obtener_usuario_por_email(usuario_email, session)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado.")
+    
+    if usuario.premium != usuario_premium:
+        usuario.premium = usuario_premium
+        session.add(usuario)
+
+    try:
+        await session.commit()
+        await session.refresh(usuario)
+        return usuario 
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(status_code=400, detail="Error al actualizar el estado del usuario a premium.")
+    
