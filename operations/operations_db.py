@@ -24,3 +24,13 @@ async def create_user(usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
 async def obtener_usuarios(session: AsyncSession) -> List[Usuario]:
     result = await session.execute(select(Usuario))
     return result.scalars().all()
+
+async def obtener_usuario_por_email(usuario_email: str, session: AsyncSession) -> Usuario:
+    result = await session.execute(select(Usuario).where(Usuario.email == usuario_email))
+    usuario = result.scalars().first()
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Email del usuario no encontrado."
+        )
+    return usuario
