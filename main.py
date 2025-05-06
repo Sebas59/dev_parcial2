@@ -45,3 +45,10 @@ async def obtener_usuarios_inactivos(session:AsyncSession=Depends(get_session)):
     if not usuario_inactivo:
         raise HTTPException(status_code=404, detail="No hay usuarios inactivos.")
     return usuario_inactivo
+
+@app.get("/usuarios/Premium/inactivos",response_model=List[Usuario])
+async def obtener_usuarios_premium_inactivos_prem(session:AsyncSession=Depends(get_session)):
+    usuario_premium_inactivo = await obtener_usuarios_inactivos_premuim_db(session)
+    if not usuario_premium_inactivo:
+        raise HTTPException(status_code=404, detail="No hay usuarios premium inactivos.")
+    return usuario_premium_inactivo
