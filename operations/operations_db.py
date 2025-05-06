@@ -21,38 +21,37 @@ async def create_user(usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
             detail="El nombre de usuario ya existe."
         )
     
-async def obtener_usuarios(session: AsyncSession) -> List[Usuario]:
+async def obtener_usuarios_db(session: AsyncSession) -> List[Usuario]:
     result = await session.execute(select(Usuario))
     return result.scalars().all()
 
-async def obtener_usuario_por_email(usuario_email: str, session: AsyncSession) -> Usuario:
+async def obtener_usuario_por_email_db(usuario_email: str, session: AsyncSession) -> Usuario:
     result = await session.execute(select(Usuario).where(Usuario.email == usuario_email))
     usuario = result.scalars().first()
     if not usuario:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=404,
             detail="Email del usuario no encontrado."
         )
     return usuario
 
-async def actualizar_usuario(usuario_email: str, usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
-    usuario_db = await obtener_usuario_por_email(usuario_email, session)
-    if usuario.email != usuario_db.email:
-        result = await session.execute(
-            select(Usuario).where(Usuario.email == usuario.email)
-        )
-        usuario_existente = result.scalars().first()
-        if usuario_existente:
-            raise HTTPException(status_code=400, detail="El nuevo email ya está en uso.")
-    for key, value in usuario.dict().items():
-        setattr(usuario_db, key, value)
-    session.add(usuario_db)
-    await session.commit()
-    await session.refresh(usuario_db)
-    return usuario_db
+async def actualizar_estado_usuario_db(email: str, estado: EstadoUsuario, session: AsyncSession):
+    usuario = await obtener_usuario_por_email_db(email, session)
+    
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-async def actualizar_usuario_premium(usuario_email:str, usuario_premium:bool, session:AsyncSession):
-    usuario= await obtener_usuario_por_email(usuario_email, session)
+    usuario.estado = estado
+    session.add(usuario)
+    
+    try:
+        await session.commit()
+        return usuario
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=400, detail="Error al actualizar el estado")
+async def actualizar_usuario_premium_db(usuario_email:str, usuario_premium:bool, session:AsyncSession):
+    usuario= await obtener_usuario_por_email_db(usuario_email, session)
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado.")
     
@@ -68,13 +67,7 @@ async def actualizar_usuario_premium(usuario_email:str, usuario_premium:bool, se
         await session.rollback()
         raise HTTPException(status_code=400, detail="Error al actualizar el estado del usuario a premium.")
     
-async def obtener_usuarios_inactivos_db(session:AsyncSession):
-    result = await session.execute(
-        select(Usuario).where(
-             Usuario.estado == EstadoUsuario.inactivo
-        )
-    )
-    return result.scalars().all()
+
 
 async def obtener_usuarios_inactivos_premuim_db(session:AsyncSession):
     result = await session.execute(
@@ -84,3 +77,13 @@ async def obtener_usuarios_inactivos_premuim_db(session:AsyncSession):
         )
     )
     return result.scalars().all()
+async def obtener_usuarios_inactivos_db(session:AsyncSession):
+    query = select(Usuario).where(
+        and_(
+            Usuario.estado == EstadoUsuario.inactivo
+        )
+    )
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
