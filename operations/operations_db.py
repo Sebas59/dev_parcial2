@@ -34,3 +34,20 @@ async def obtener_usuario_por_email(usuario_email: str, session: AsyncSession) -
             detail="Email del usuario no encontrado."
         )
     return usuario
+
+async def actualizar_usuario(usuario_email: str, usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
+    usuario_db = await obtener_usuario_por_email(usuario_email, session)
+    if usuario.email != usuario_db.email:
+        result = await session.execute(
+            select(Usuario).where(Usuario.email == usuario.email)
+        )
+        usuario_existente = result.scalars().first()
+        if usuario_existente:
+            raise HTTPException(status_code=400, detail="El nuevo email ya está en uso.")
+    for key, value in usuario.dict().items():
+        setattr(usuario_db, key, value)
+    session.add(usuario_db)
+    await session.commit()
+    await session.refresh(usuario_db)
+    return usuario_db
+
