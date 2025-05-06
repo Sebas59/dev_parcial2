@@ -23,3 +23,7 @@ app = FastAPI(lifespan=lifespan)
 async def crear_usuario(usuario: UsuarioCreate, session: AsyncSession = Depends(get_session)):
     return await create_user(usuario, session)
 
+@app.get("/usuarios/", response_model=List[Usuario])
+async def obtener_usuarios(session: AsyncSession = Depends(get_session)):
+    return await obtener_usuarios(session)
+
