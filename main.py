@@ -38,3 +38,10 @@ async def actualizar_usuario_db(usuario_email:str, usuario:UsuarioCreate, sessio
 @app.patch("/usuarios/{usuario_email}/premium", response_model=Usuario)
 async def actualizar_usuario_premium(usuario_email:str, usuario_premium:bool, session:AsyncSession=Depends(get_session)):
     return await actualizar_usuario_premium(usuario_email, usuario_premium, session)
+
+@app.get("/usuarios/inactivos",response_model=List[Usuario])
+async def obtener_usuarios_inactivos(session:AsyncSession=Depends(get_session)):
+    usuario_inactivo = await obtener_usuarios_inactivos_db(session)
+    if not usuario_inactivo:
+        raise HTTPException(status_code=404, detail="No hay usuarios inactivos.")
+    return usuario_inactivo
