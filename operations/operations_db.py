@@ -1,1 +1,22 @@
-'''Aqui debes construir las operaciones que se te han indicado'''
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.future import select
+from sqlalchemy import and_
+from fastapi import HTTPException, status
+from typing import List
+from data.models import Usuario, EstadoEnum
+from data.schemas import UsuarioCreate
+
+async def create_user(usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
+    nuevo_usuario = Usuario(**usuario.dict())
+    session.add(nuevo_usuario)
+    try:
+        await session.commit()
+        await session.refresh(nuevo_usuario)
+        return nuevo_usuario
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="El nombre de usuario ya existe."
+        )
