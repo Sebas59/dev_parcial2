@@ -64,3 +64,10 @@ async def obtener_tareas(session: AsyncSession = Depends(get_session)):
 @app.get("/tareas/usuarios/{usuario_id}", response_model=List[TareaRead], tags=["Tareas"])
 async def obtener_tareas_por_usuario(usuario_id: int, session: AsyncSession = Depends(get_session)):
     return await obtener_tarea_por_usuario_db(usuario_id, session)
+
+@app.patch("/tareas/{tarea_id}/estado", response_model=TareaRead, tags=["Tareas"])
+async def actualizar_estado_tarea(tarea_id: int, estado: EstadoTarea, session: AsyncSession = Depends(get_session)):
+    try:
+        return await actualizar_estado_tarea_db(tarea_id, estado, session)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
