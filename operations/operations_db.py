@@ -97,6 +97,8 @@ async def crear_tarea_db(tarea:TareaCreate, session:AsyncSession)-> Tarea:
         await session.rollback()
         raise HTTPException(status_code=400, detail="Error al crear la tarea.")
 
-
+async def obtener_tareas_db(session:AsyncSession)-> List[Tarea]:
+    result = await session.execute(select(Tarea))
+    return result.scalars().all()
     
 
