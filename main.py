@@ -56,3 +56,7 @@ async def obtener_usuarios_inactivos_db(session:AsyncSession=Depends(get_session
 @app.post("/tareas/", response_model=TareaRead, tags=["Tareas"])
 async def crear_tarea(tarea: TareaCreate, session: AsyncSession = Depends(get_session)):
     return await crear_tarea_db(tarea, session)
+
+@app.get("/tareas/", response_model=List[TareaRead], tags=["Tareas"])
+async def obtener_tareas(session: AsyncSession = Depends(get_session)):
+    return await obtener_tareas_db(session)
