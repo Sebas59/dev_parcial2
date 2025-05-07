@@ -1,5 +1,7 @@
 from sqlmodel import SQLModel, Field,Relationship
 from typing import Optional
+from sqlalchemy import Enum as SqlEnum
+from datetime import datetime
 import enum
 
 class EstadoUsuario(str, enum.Enum):
@@ -27,6 +29,8 @@ class Tarea(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     nombre: str
     descripcion: str
-    estado: EstadoTarea
+    fecha_creacion: datetime = Field(default_factory=datetime.utcnow)
+    fecha_modificacion: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    estado: EstadoTarea = Field(sa_column=SqlEnum(EstadoTarea),default=EstadoTarea.pendiente)
     usuario_id: int = Field(foreign_key="usuarios.id",nullable=False)
     usuario: Optional[Usuario]= Relationship(back_populates="tareas")
