@@ -6,19 +6,19 @@ class UsuarioCreate(SQLModel):
     nombre: str
     email: str
     estado: EstadoUsuario
-    premium: bool = False
+    premium: bool 
 
 class TareaCreate(SQLModel):
     nombre: str
-    descripcion: str
-    estado: EstadoTarea
-    Usuario_id: int
+    descripcion: Optional[str]= None
+    estado: Optional[EstadoTarea] = EstadoTarea.pendiente
+    usuario_id: int
 
 class TareaRead(SQLModel):
     id: int
     nombre: str
-    descripcion: str
+    descripcion: Optional[str]
     fecha_creacion: datetime
     fecha_modificacion: datetime
     estado: EstadoTarea
-    Usuario_id: int
+    usuario_id: int
