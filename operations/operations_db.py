@@ -4,8 +4,9 @@ from sqlalchemy.future import select
 from sqlalchemy import and_
 from fastapi import HTTPException, status
 from typing import List
-from data.models import *
-from data.schemas import *
+from datetime import datetime
+from data.models import Usuario, Tarea, EstadoUsuario, EstadoTarea
+from data.schemas import UsuarioCreate, TareaCreate, TareaRead
 
 async def create_user(usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
     nuevo_usuario = Usuario(**usuario.dict())
@@ -86,19 +87,22 @@ async def obtener_usuarios_inactivos_db(session:AsyncSession):
     result = await session.execute(query)
     return result.scalars().all()
 
-async def crear_tarea_db(tarea:TareaCreate, session:AsyncSession)-> Tarea:
+async def crear_tarea_db(tarea: TareaCreate, session: AsyncSession) -> Tarea:
     nueva_tarea = Tarea(**tarea.dict())
     session.add(nueva_tarea)
-    try:
-        await session.commit()
-        await session.refresh(nueva_tarea)
-        return nueva_tarea
-    except IntegrityError:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail="Error al crear la tarea.")
+    await session.commit()
+    await session.refresh(nueva_tarea)
+    return nueva_tarea
+
 
 async def obtener_tareas_db(session:AsyncSession)-> List[Tarea]:
     result = await session.execute(select(Tarea))
+    return result.scalars().all()
+
+async def obtener_tarea_por_usuario_db(usuario_id:int, session:AsyncSession)-> List[Tarea]:
+    result = await session.execute(
+        select(Tarea).where(Tarea.usuario_id== usuario_id)
+    )
     return result.scalars().all()
     
 
