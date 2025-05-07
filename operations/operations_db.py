@@ -51,6 +51,7 @@ async def actualizar_estado_usuario_db(email: str, estado: EstadoUsuario, sessio
     except Exception as e:
         await session.rollback()
         raise HTTPException(status_code=400, detail="Error al actualizar el estado")
+    
 async def actualizar_usuario_premium_db(usuario_email:str, usuario_premium:bool, session:AsyncSession):
     usuario= await obtener_usuario_por_email_db(usuario_email, session)
     if not usuario:
