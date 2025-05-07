@@ -46,12 +46,13 @@ async def obtener_usuarios_premium_inactivos_prem(session:AsyncSession=Depends(g
         raise HTTPException(status_code=404, detail="No hay usuarios premium inactivos.")
     return usuario_premium_inactivo
 
-@app.get("/usuarios/inactivos",response_model=List[Usuario], tags=["Usuarios"])
-async def obtener_usuarios_inactivos_db(session:AsyncSession=Depends(get_session)):
-    usuario_inactivo = await obtener_usuarios_inactivos_db(session)
-    if not usuario_inactivo:
+@app.get("/usuarios/inactivos", response_model=List[Usuario], tags=["Usuarios"])
+async def listar_usuarios_inactivos(session: AsyncSession = Depends(get_session)):
+    usuarios = await obtener_usuarios_inactivos_db(session)
+    if not usuarios:
         raise HTTPException(status_code=404, detail="No hay usuarios inactivos.")
-    return usuario_inactivo
+    return usuarios
+
 
 @app.post("/tareas", response_model=TareaRead, tags=["Tareas"])
 async def crear_tarea(tarea: TareaCreate, session: AsyncSession = Depends(get_session)):
